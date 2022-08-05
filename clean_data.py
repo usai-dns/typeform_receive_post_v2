@@ -63,8 +63,9 @@ def agent_info_dict(incoming_dict):
 def intake_data(agent_dict):
   CSV_ADDRESS = agent_dict['List Path']
   #problem here is probaby parsing the path with an R string. check the colab verison functioning well.
-  csv_url = f'{CSV_ADDRESS}'
-  work_df = pd.read_csv(csv_url)
+  # csv_url = f'{CSV_ADDRESS}'
+  work_df = pd.read_csv(CSV_ADDRESS)
+  print('df loaded')
   return work_df
 
 def camel_name(name):

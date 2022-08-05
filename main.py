@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 import json
-import pandas
+import pandas as pd
 import find_path as fp
 import clean_data as cld
 
@@ -36,19 +36,24 @@ def submit():
       answer_dict[pair[0]] = pair[1]
 
     this_agent_dict = cld.agent_info_dict(answer_dict)
-
+ 
+    print(this_agent_dict['List Path'])
+    work_df = pd.read_csv(this_agent_dict['List Path'])
+      
+          
     work_df = cld.combined_clean(this_agent_dict)
 
     cld.output_csvs(work_df, this_agent_dict, 300)
+
+    
     # for key in this_agent_dict.keys():
     #   print(key, ': ', this_agent_dict[key])
 
     # for pth in fp.find_key(data, 'title'):
     #   print(pth)
 
-    
-    
-    return "webhook received!" 
+    return "webhook received"
+
 
     
   else:
