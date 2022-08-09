@@ -10,7 +10,7 @@ AC docs: https://developers.activecampaign.com/reference/retrieve-fields?youracc
 API_KEY = '40ddd4d7744346d5064b3dd77bef3bc0635ce1b64059b85cf34c74b5435ece2d851573a2'
 AC_BULK_IMPORT_URL = "https://peaksiderealty.api-us1.com/api/3/import/bulk_import"
 AC_FIELDS_URL = "https://peaksiderealty.api-us1.com/api/3/fields"
-AC_LISTS_URL = "https://peaksiderealty.api-us1.com/api/3/lists"
+AC_LISTS_URL = "https://peaksiderealty.api-us1.com/api/3/lists?limit=1000"
 
 KEEP_LIST = ['Agent First Name:', 'Agent Last Name', 'Agent Email:', 'Agent Phone Number:', 'Agent Brokerage:',
             'Agent Website:', 'Brokerage Street Address', 'Agent City:', 'Inquiring on Property?', 
@@ -48,7 +48,7 @@ def get_all_lists(file_name, url=AC_LISTS_URL, key=API_KEY):
     '''
     get all lists from the api
     '''
-    url = "https://peaksiderealty.api-us1.com/api/3/lists?limit=1000"
+    # url = "https://peaksiderealty.api-us1.com/api/3/lists?limit=1000"
 
     headers = {
         "Accept": "application/json",
@@ -60,7 +60,7 @@ def get_all_lists(file_name, url=AC_LISTS_URL, key=API_KEY):
     return json.loads(response.text)
 
 
-def create_contact_dict(contact):
+def create_contact_dict(contact, list_id):
     '''
     takes a dict and creates a dict for the AC api
     '''
@@ -122,7 +122,7 @@ def create_contact_dict(contact):
                     "value": contact['Lead Type']
                 },
            ]
-    ac_dict['subscribe'] = [{'listid': '41'}]
+    ac_dict['subscribe'] = [{'listid': list_id}]
     ac_dict['email'] = contact['EMAIL']
     ac_dict['first_name'] = contact['FIRST']
     ac_dict['last_name'] = contact['LAST']
@@ -131,11 +131,11 @@ def create_contact_dict(contact):
     return ac_dict
 
 
-def reformat_contact_dict(contact_dict):
+def reformat_contact_dict(contact_dict, list_id):
     '''takes list of dicts from to_dict and reformats them to a list of dicts for the AC api'''
     contacts = [] # [contact for contact in create_contact_dict(contact)] ?
     for contact in contact_dict:
-        contacts.append(create_contact_dict(contact))
+        contacts.append(create_contact_dict(contact, list_id))
     return contacts
     
 
@@ -223,6 +223,3 @@ def bulk_upload(url, key, contact_list):
 # here is the suggestion for bulk upload, custom fields updated via ID
 # https://developers.activecampaign.com/reference/bulk-import-contacts
 
-
-lists = get_all_lists('all lists updated.json', AC_LISTS_URL, API_KEY)
-print(type(lists))

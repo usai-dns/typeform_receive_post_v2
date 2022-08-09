@@ -19,43 +19,58 @@ https://pynative.com/convert-pandas-dataframe-to-dict/#:~:text=When%20we%20have%
 '''
 
 
-data = id.create_test_dict('typeform test data.json')
-transformed_data = id.typeform_response_dict(data)
-this_agent_dict = cld.agent_info_dict(transformed_data)
-clean_df = cld.combined_clean(this_agent_dict)
-print(clean_df.head())
-contact_list_from_df = clean_df.to_dict('records')
-contact_list = ace.reformat_contact_dict(contact_list_from_df)
-print(contact_list[:1])
-ace.update_lists_ac_api(contact_list, 5)
+# data = id.create_test_dict('typeform test data.json')
+# transformed_data = id.typeform_response_dict(data)
+# this_agent_dict = cld.agent_info_dict(transformed_data)
+# lists = ace.get_all_lists('all lists updated.json')
+# list_id = fp.find_agent_list_id_list(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
+# while list_id == None:
+#     print('list not found')
+#     break
+
+# clean_df = cld.combined_clean(this_agent_dict)
+# print(clean_df.head())
+# contact_list_from_df = clean_df.to_dict('records')
+# contact_list = ace.reformat_contact_dict(contact_list_from_df, list_id)
+# # print(contact_list[:1])
+# ace.update_lists_ac_api(contact_list, 300)
 
 ######
-# app = Flask("app",
-#   template_folder="templates", # name of folder containing html templates
-#   static_folder="static" # name of folder for static files
-# )
+app = Flask("app",
+  template_folder="templates", # name of folder containing html templates
+  static_folder="static" # name of folder for static files
+)
 
-# @app.route("/", methods=['GET', 'POST'])
-# def submit():
-#   if request.method == 'POST':
-    ## get the json file from the form
-    # data = request.json
-    # transformed_data = id.typeform_response_dict(data)
-    # this_agent_dict = cld.agent_info_dict(transformed_data)
-    # clean_df = cld.combined_clean(this_agent_dict)
-    # contact_list_from_df = clean_df.to_dict('records')
-    # contact_list = ace.reformat_contact_dict(contact_list_from_df)
-    #then update list in ac, function pending. update_list_ac_api(contact_list)
+@app.route("/", methods=['GET', 'POST'])
+def submit():
+  if request.method == 'POST':
+    # get the json file from the form
+    data = request.json
+
+    transformed_data = id.typeform_response_dict(data)
+    this_agent_dict = cld.agent_info_dict(transformed_data)
+    lists = ace.get_all_lists('all lists updated.json')
+    list_id = fp.find_agent_list_id_list(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
+    while list_id == None:
+        print('list not found')
+        break
+
+    clean_df = cld.combined_clean(this_agent_dict)
+    print(clean_df.head())
+    contact_list_from_df = clean_df.to_dict('records')
+    contact_list = ace.reformat_contact_dict(contact_list_from_df, list_id)
+    # print(contact_list[:1])
+    ace.update_lists_ac_api(contact_list, 300)
 
 
-#     return "webhook received"
+    return "webhook received"
 
 
     
-#   else:
-#     return "nothing"
+  else:
+    return "nothing"
   
-# app.run(host="0.0.0.0", port=8080) # run the application
+app.run(host="0.0.0.0", port=8080) # run the application
 ######
 
 
