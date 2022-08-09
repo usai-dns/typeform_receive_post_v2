@@ -60,13 +60,13 @@ def find_agent_list_id_json(agent_name, lead_type, lists_json):
   with open(lists_json) as f:
     lists = json.load(f)
   for list in lists['lists']:
-    if agent_name in list['stringid'] and lead_type in list['stringid']:
+    if agent_name.lower() in list['name'].lower() and lead_type.lower() in list['name'].lower():
       return list['id']
 
 
 def find_agent_list_id_list(agent_name, lead_type, lists_list):
-  for list in lists_list:
-    if agent_name in list['stringid'] and lead_type in list['stringid']:
+  for list in lists_list['lists']:
+    if agent_name.lower() in list['name'].lower() and lead_type.lower() in list['name'].lower():
       return list['id']
 
 
