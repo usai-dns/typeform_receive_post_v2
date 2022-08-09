@@ -1,9 +1,14 @@
 import pandas as pd
 import numpy as np
 import re
+import json 
+
 
 keep_col_list = ['FIRST', 'LAST', 'Prop_Address', 'Prop-City',
                  'Prop-State', 'Prop-Zip', 'PHONE1', 'PHONE2', 'EMAIL',]
+
+lead_types = ['Absentee-Owner', 'Downsize' 'Divorce', 'Likely-To-Sell',
+              'Distressed', 'Motivated-Seller', 'Expired-Listing', 'Tax-Lein']
 
 # AGENT_FIRST = "Harvey"
 # AGENT_LAST = "Blankfeld"
@@ -55,6 +60,8 @@ def agent_info_dict(incoming_dict):
           agent_dict['Brokerage Zip'] = incoming_dict[key]
       elif 'list here' in key:
           agent_dict['List Path'] = incoming_dict[key]
+      elif 'which kind' in key:
+          agent_dict['Lead Type'] = incoming_dict[key]
       
     return agent_dict
 
@@ -64,9 +71,9 @@ def intake_data(agent_dict):
   CSV_ADDRESS = agent_dict['List Path']
   #problem here is probaby parsing the path with an R string. check the colab verison functioning well.
   # csv_url = f'{CSV_ADDRESS}'
-  work_df = pd.read_csv(CSV_ADDRESS)
+  df = pd.read_csv(CSV_ADDRESS)
   print('df loaded')
-  return work_df
+  return df
 
 def camel_name(name):
   cased_name = name[:1] + name[1:].lower()
@@ -81,16 +88,19 @@ def drop_cols(df, keep_list):
 def add_agent_info(df, agent_dict):
   agent_keys = agent_dict.keys()
   for key in agent_keys:
-    df[key] = agent_dict[key]
+    if "List" not in key:
+      df[key] = agent_dict[key]
 
 
-def fill_blank_email(data_frame):
+def fill_blank_email(df):
   '''
   fills empty email with name
   '''
 
-  data_frame['EMAIL'] = data_frame['EMAIL'].fillna(data_frame['FIRST'] + '.' + data_frame['LAST'] + '@no-email.com')
-
+  df['EMAIL'] = df['EMAIL'].fillna(df['FIRST'] + '.' + df['LAST'] + '@no-email.com')
+  df = df.fillna(value="")
+  df = df.replace("nan", "")
+  return df
 
 def captialize_first_letter_of_each_word(string):
     '''
@@ -163,6 +173,9 @@ def combined_clean(agent_dict, keep_cols = keep_col_list):
   add_agent_info(work_df, agent_dict)
   two_phone_merge(work_df, 'PHONE2', 'PHONE1')
   name_cap_fix(work_df, ['FIRST', 'LAST'])
+  work_df = fill_blank_email(work_df)
+  work_df['Prop_Address'] = work_df['Prop_Address'].apply(captialize_first_letter_of_each_word)
+  work_df['Prop-City'] = work_df['Prop-City'].apply(captialize_first_letter_of_each_word)
   work_df['Prop-Zip'] = work_df['Prop-Zip'].apply(remove_zip_last4)
   return work_df
 
@@ -171,6 +184,3 @@ def output_csvs(df, agent_dict, split_length):
   agent_name = f"{agent_dict['Agent First Name']} {agent_dict['Agent Last Name']}"
   combined_split(zips_dict, agent_name, 300)
   
-
-#still need to create agent info dict to get passed and applied to df
-#then df needs to get parsed to csv(s) and saved to activecampaign or google drive.
