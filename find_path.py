@@ -64,10 +64,27 @@ def find_agent_list_id_json(agent_name, lead_type, lists_json):
       return list['id']
 
 
-def find_agent_list_id_list(agent_name, lead_type, lists_list):
-  for list in lists_list['lists']:
-    if agent_name.lower() in list['name'].lower() and lead_type.lower() in list['name'].lower():
-      return list['id']
+
+def return_agent_list_id(agent_name, lead_type, lists_list):
+    '''
+    find the list id for the agent's lead list and pending list, if they don't exist, create them <--- not done yet 8/16 
+
+    create lists will be in activecampaign_export.py
+    lists_list could directly be fetched here
+    '''
+    list_id_dict = {'target list id': None, 'pending list id': None}
+    for lst in lists_list['lists']:
+        if (agent_name.lower() in lst['name'].lower() ) and (lead_type.lower() in lst['name'].lower() ) and ('pending' not in lst['name'].lower()):
+            list_id_dict['target list id'] = lst['id']
+            print('Existing Agent Target List id: ', list_id_dict['target list id'])
+            print(lst)
+        if (agent_name.lower() in lst['name'].lower() ) and (lead_type.lower() in lst['name'].lower() ) and ('pending' in lst['name'].lower()):
+            list_id_dict['pending list id'] = lst['id']
+            print('Agent Pending List id: ', list_id_dict['pending list id'])
+            print(lst)
+
+    return (list_id_dict)
+
 
 
 # for field_name in keep_list:

@@ -20,14 +20,15 @@ lead_types = ['Absentee-Owner', 'Downsize' 'Divorce', 'Likely-To-Sell',
 # BROKERAGE_CITY = "Las Vegas, NV"
 # AGENT_FULL_NAME = AGENT_FIRST + ' ' + AGENT_LAST
 
-# this_agent_dict = {'Agent First Name': AGENT_FIRST,
+# agent_dict = {'Agent First Name': AGENT_FIRST,
 #               'Agent Last Name': AGENT_LAST,
 #               'Agent Phone': AGENT_PHONE,
 #               'Agent Email': AGENT_EMAIL,
 #               'Agent Website': AGENT_WEBSITE,
 #               'Brokerage Name': AGENT_BROKERAGE,
 #               'Brokerage Address': BROKERAGE_ADDRESS,
-#               'Brokerage City': BROKERAGE_CITY
+#               'Brokerage City': BROKERAGE_CITY,
+#               'Lead Type': LEAD_TYPE
 #               }
 
 

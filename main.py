@@ -19,121 +19,103 @@ https://pynative.com/convert-pandas-dataframe-to-dict/#:~:text=When%20we%20have%
 '''
 
 
-# data = id.create_test_dict('typeform test data.json')
-# transformed_data = id.typeform_response_dict(data)
-# this_agent_dict = cld.agent_info_dict(transformed_data)
-# lists = ace.get_all_lists('all lists updated.json')
-# list_id = fp.find_agent_list_id_list(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
-# while list_id == None:
-#     print('list not found')
-#     break
+data = id.create_test_dict('typeform test data.json')
+transformed_data = id.typeform_response_dict(data)
+# create a dict with the agent info from typeform
+this_agent_dict = cld.agent_info_dict(transformed_data)
 
-# clean_df = cld.combined_clean(this_agent_dict)
+# get the list of lists from the activecampaign api - currently skipped as we're pulling from the api
+lists = ace.get_all_lists('all lists updated.json')
+
+with open('pulled list data.json', 'w', encoding='utf-8') as f:
+    json.dump(lists, f, ensure_ascii=False, indent=4)
+## lists exist, but i think the Links section needs to be amended for them to be visible in the AC UI
+# get the list id for the agent by type of lead
+list_id_dict = fp.return_agent_list_id(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
+for k,v in list_id_dict.items():
+    print('found', k, ': ', v)
+
+
+# check if the list id is found, if not create it and return list id
+updated_list_ids = ace.agent_list_update(this_agent_dict, list_id_dict)
+for k,v in updated_list_ids.items():
+    print('updated: ', k, ': ', v)
+# # transform dataframe and add agent info to entries
+# # calls intake data to get the dataframe from csv
+# # calls add_agent_info to add agent info to dataframe
+clean_df = cld.combined_clean(this_agent_dict)
 # print(clean_df.head())
-# contact_list_from_df = clean_df.to_dict('records')
-# contact_list = ace.reformat_contact_dict(contact_list_from_df, list_id)
-# # print(contact_list[:1])
-# ace.update_lists_ac_api(contact_list, 300)
 
-######
-app = Flask("app",
-  template_folder="templates", # name of folder containing html templates
-  static_folder="static" # name of folder for static files
-)
+# # convert the dataframe to a list of dicts with pandas 'records' format
+contact_list_from_df = clean_df.to_dict('records')
 
-@app.route("/", methods=['GET', 'POST'])
-def submit():
-  if request.method == 'POST':
-    # get the json file from the form
-    data = request.json
+# '''reformat the dicts to match the activecampaign api
+# this needs to get adjusted to that it only pulls the UPDATE_CHUNK_SIZE number of dicts at a time
+# then we can put the remaining dicts in the pending list and update the api
+# '''
+contact_list = ace.reformat_contact_dict(contact_list_from_df[:UPDATE_CHUNK_SIZE], updated_list_ids['target_list_id'])
+pending_contact_list = ace.reformat_contact_dict(contact_list_from_df[UPDATE_CHUNK_SIZE:], updated_list_ids['pending_list_id'])
+# # print(contact_list[:1]) # test to see if the dict is formatted correctly
 
-    transformed_data = id.typeform_response_dict(data)
-    this_agent_dict = cld.agent_info_dict(transformed_data)
-    lists = ace.get_all_lists('all lists updated.json')
-    list_id = fp.find_agent_list_id_list(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
-    while list_id == None:
-        print('list not found')
-        break
-
-    clean_df = cld.combined_clean(this_agent_dict)
-    print(clean_df.head())
-    contact_list_from_df = clean_df.to_dict('records')
-    contact_list = ace.reformat_contact_dict(contact_list_from_df, list_id)
-    # print(contact_list[:1])
-    ace.update_lists_ac_api(contact_list, 300)
+# # upload the list of dicts to the activecampaign api
+ace.update_lists_ac_api(contact_list)
+ace.update_lists_ac_api(pending_contact_list)
 
 
-    return "webhook received"
+# ################################################
+# UPDATE_CHUNK_SIZE = 300
 
+# app = Flask("app",
+#   template_folder="templates", # name of folder containing html templates
+#   static_folder="static" # name of folder for static files
+# )
 
-    
-  else:
-    return "nothing"
-  
-app.run(host="0.0.0.0", port=8080) # run the application
-######
-
-
-#everything below was moved to another module
-
-    # questions = []
-    # answers = []
-    # for entry in data['form_response']['definition']['fields']:
-    #   questions.append(entry['title'])
-  
-    # for entry in data['form_response']['answers']:
-    #   item_type = entry['type']
-    #   if item_type == 'choice':
-    #     answers.append(entry['choice']['label'])
-    #   else:
-    #     answers.append(entry[item_type])
-
-    # answer_dict = {}
-    
-    # for pair in zip(questions, answers):
-    #   answer_dict[pair[0]] = pair[1]
-
-    # this_agent_dict = cld.agent_info_dict(answer_dict)
- 
-    # print(this_agent_dict['List Path'])
-    # work_df = pd.read_csv(this_agent_dict['List Path'])
-      
-          
-    # work_df = cld.combined_clean(this_agent_dict)
-
-    # cld.output_csvs(work_df, this_agent_dict, 300)
-
-    
-    # for key in this_agent_dict.keys():
-    #   print(key, ': ', this_agent_dict[key])
-
-    # for pth in fp.find_key(data, 'title'):
-    #   print(pth)
-
-
-
-
-  # if request.method == 'GET':
-  #   pass
-    # text = request.args['TEXT']
-    # return text
-  # elif request.method == 'POST':
-  #   data = request.json
-  #   print("Data received from webhook is: ", request.json)
-  #   return "webhook received!"
-
-
-# def index():
-  # return render_template("index.html")
-  # return "hello world"
-
-# @app.route("/submit", methods=['GET', 'POST'])
+# @app.route("/", methods=['GET', 'POST'])
 # def submit():
-#   if request.method == 'GET':
-#     text = request.args['TEXT']
-#     return text
-#   elif request.method == 'POST':
+#   if request.method == 'POST':
+#     # get the json file from the form
 #     data = request.json
-#     print("Data received from webhook is: ", request.json)
-#     return "webhook received!"
+#     # transform the json file into a dict
+#     transformed_data = id.typeform_response_dict(data)
+#     # create a dict with the agent info from typeform
+#     this_agent_dict = cld.agent_info_dict(transformed_data)
+#     # get the list of lists from the activecampaign api
+#     lists = ace.get_all_lists('all lists updated.json')
+#     # get the list id for the agent by type of lead
+#     list_id_dict = fp.return_agent_list_id(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
+#     # check if the list id is found, if not create it and return list id
+#     updated_list_ids = agent_list_update(this_agent_dict, list_id_dict)
+  
+
+#     # transform dataframe and add agent info to entries
+#     # calls intake data to get the dataframe from csv
+#     # calls add_agent_info to add agent info to dataframe
+#     clean_df = cld.combined_clean(this_agent_dict)
+#     print(clean_df.head())
+
+#     # convert the dataframe to a list of dicts
+#     contact_list_from_df = clean_df.to_dict('records')
+
+#     '''reformat the dicts to match the activecampaign api
+#     this needs to get adjusted to that it only pulls the UPDATE_CHUNK_SIZE number of dicts at a time
+#     then we can put the remaining dicts in the pending list and update the api
+#     '''
+#     contact_list = ace.reformat_contact_dict(contact_list_from_df[:UPDATE_CHUNK_SIZE], updated_list_ids['target_list_id'])
+#     pending_contact_list = ace.reformat_contact_dict(contact_list_from_df[UPDATE_CHUNK_SIZE:], updated_list_ids['pending_list_id'])
+#     # print(contact_list[:1]) # test to see if the dict is formatted correctly
+
+#     # upload the list of dicts to the activecampaign api
+#     ace.update_lists_ac_api(contact_list)
+#     ace.update_lists_ac_api(pending_contact_list)
+
+
+#     -return "webhook received"
+
+
+    
+#   else:
+#     return "nothing"
+  
+# app.run(host="0.0.0.0", port=8080) # run the application
+# ##############################################
 
