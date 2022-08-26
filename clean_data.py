@@ -34,7 +34,7 @@ lead_types = ['Absentee-Owner', 'Downsize' 'Divorce', 'Likely-To-Sell',
 
 def agent_info_dict(incoming_dict):
     '''
-    covert dict names to shortened keys
+    take typeform data dict and create agent info dict
     '''
     agent_dict = {}
   
@@ -116,16 +116,12 @@ def address_fix(df, col_list):
 
 
 def two_phone_merge(df, priority_phone, secondary_phone):
+  #this modifies the dataframe in place to merge the two phone columns with preference to phone 2 (mobile)
   df[f'{priority_phone}'].fillna(df[f'{secondary_phone}'], inplace=True)
   df.drop(f'{secondary_phone}', inplace=True, axis=1)
   df.rename(columns= {f'{priority_phone}': 'PHONE'}, inplace=True)
   df['PHONE'] = df['PHONE'].astype(str).apply(lambda x: x.split('.')[0])
-  '''
-  original code
-  work_df.PHONE2.fillna(work_df.PHONE1, inplace=True)
-  work_df.drop('PHONE1', inplace=True, axis=1)
-  work_df.rename(columns= {'PHONE2': 'PHONE'}, inplace=True)
-  '''
+
 
 
 def name_cap_fix(df, col_names):
