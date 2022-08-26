@@ -140,7 +140,7 @@ def create_contact_dict(contact, list_id):
                 },
                 {
                     "id": 15,
-                    "value": contact['Brokerage Address']
+                    "value": contact['Brokerage Street Address'] #had inconsistent key
                 },
                 {
                     "id": 8,
@@ -194,7 +194,7 @@ def create_agent_list(agent_info, list_type, url=AC_LISTS_URL, key=API_KEY):
             "send_last_broadcast": False,
             "name": f"{agent_info['Agent First Name']} {agent_info['Agent Last Name']} - {agent_info['Lead Type']} - {list_type}",
             "stringid": string_id,
-            "sender_url": f"{agent_info['Agent Website']}",
+            "sender_url": f"{agent_info['Agent Website']}", #error here
             "sender_reminder": "click to unsubscribe",
             "user": 1,
             "fulladdress": ""
@@ -354,7 +354,7 @@ def get_agent_fields(agent_id, agent_dict, key=API_KEY):
 
     field_number_values = {'7': 'Brokerage Name',
                        '8': 'Brokerage City',
-                       '11': 'Brokerage Website',
+                       '11': 'Agent Website',
                        '15': 'Brokerage Street Address',
                        }
     # create the url for the fields given the agent id

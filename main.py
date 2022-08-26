@@ -39,17 +39,26 @@ def submit():
 
     # select from the dict the data we want to use 
     transformed_data = id.typeform_response_dict(data) # this might still work for new typeform
-
+    for k, v in transformed_data.items():
+      print('transformed data: ', k, ' - ', v)
     # create a dict with the agent info from typeform
-    this_agent_dict = cld.agent_info_dict(transformed_data) # this might too
-
+    this_agent_dict = cld.agent_info_dict(transformed_data)
+    
+    for k, v in this_agent_dict.items():
+      print('agent dict: ', k, ' - ', v)
     ############# untested ##############
     # using these is going to require a different way of handling a typeform json file
     # returns basic contact of agent dict from AC
     fetched_agent_info = ace.get_agent_contact_info(this_agent_dict['Agent Email']) # email extracted from typeform json
+    fetched_agent_info['Lead Type'] = this_agent_dict['Lead Type']
+    fetched_agent_info['List Path'] = this_agent_dict['List Path']
+    for k, v in fetched_agent_info.items():
+      print('fetched info dict: ', k, ' - ', v)
 
     # returns dict of agent fields from AC via agent_id
     final_agent_info = ace.get_agent_fields(fetched_agent_info['Agent Contact ID'], fetched_agent_info)
+    for k, v in fetched_agent_info.items():
+      print('final info dict: ', k, ' - ', v)
     ############# untested ##############
 
 
@@ -61,20 +70,20 @@ def submit():
         json.dump(lists, f, ensure_ascii=False, indent=4)
 
     # get the list id for the agent by type of lead
-    list_id_dict = fp.return_agent_list_id(this_agent_dict['Agent First Name'], this_agent_dict['Lead Type'], lists)
+    list_id_dict = fp.return_agent_list_id(final_agent_info['Agent First Name'], final_agent_info['Lead Type'], lists)
     for k,v in list_id_dict.items():
         print('found', k, ': ', v)
 
 
     # check if the list id is found, if not create it, update listGroups, and return list id
-    updated_list_ids = ace.agent_list_update(this_agent_dict, list_id_dict)
+    updated_list_ids = ace.agent_list_update(final_agent_info, list_id_dict)
     for k,v in updated_list_ids.items():
         print('updated: ', k, ': ', v)
 
     # # transform dataframe and add agent info to entries
     # # calls intake data to get the dataframe from csv
     # # calls add_agent_info to add agent info to dataframe
-    clean_df = cld.combined_clean(this_agent_dict)
+    clean_df = cld.combined_clean(final_agent_info)
     # print(clean_df.head())
 
     # # convert the dataframe to a list of dicts with pandas 'records' format

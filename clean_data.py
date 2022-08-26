@@ -59,9 +59,9 @@ def agent_info_dict(incoming_dict):
           agent_dict['Brokerage State'] = incoming_dict[key]
       elif 'zip' in key:
           agent_dict['Brokerage Zip'] = incoming_dict[key]
-      elif 'list here' in key:
+      elif 'csv here' in key:
           agent_dict['List Path'] = incoming_dict[key]
-      elif 'which kind' in key:
+      elif 'which kind' in key.lower():
           agent_dict['Lead Type'] = incoming_dict[key]
       
     return agent_dict
