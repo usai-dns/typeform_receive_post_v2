@@ -1,0 +1,68 @@
+{
+    "event_id": "01GBE2FTY6X3K7XG4HA849WX39",
+    "event_type": "form_response",
+    "form_response": {
+      "form_id": "QOddygvS",
+      "token": "f681rystfyrf681d22g9bn6hgy6rd22g",
+      "landed_at": "2022-08-26T21:56:09Z",
+      "submitted_at": "2022-08-26T21:56:19Z",
+      "definition": {
+        "id": "QOddygvS",
+        "title": "Find Agent + Add List",
+        "fields": [
+          {
+            "id": "d6AOdZeS9fkD",
+            "ref": "74969094-dc6a-40be-aac8-9dc8de2e455b",
+            "type": "email",
+            "title": "What is the Agent's email address?",
+            "properties": {}
+          },
+          {
+            "id": "eWEvW2IK3xMc",
+            "ref": "25eec6ff-d9fd-41be-abd8-9309ae68bfe3",
+            "type": "dropdown",
+            "title": "Which kind of leads are these?",
+            "properties": {}
+          },
+          {
+            "id": "JAfy2LUm9bE5",
+            "ref": "73e92650-dd2e-4274-92bc-1056082b0a92",
+            "type": "file_upload",
+            "title": "Please upload the csv here!",
+            "properties": {}
+          }
+        ]
+      },
+      "answers": [
+        {
+          "type": "email",
+          "email": "testagent@highiq.io",
+          "field": {
+            "id": "d6AOdZeS9fkD",
+            "type": "email",
+            "ref": "74969094-dc6a-40be-aac8-9dc8de2e455b"
+          }
+        },
+        {
+          "type": "choice",
+          "choice": {
+            "label": "Absentee-Owner"
+          },
+          "field": {
+            "id": "eWEvW2IK3xMc",
+            "type": "dropdown",
+            "ref": "25eec6ff-d9fd-41be-abd8-9309ae68bfe3"
+          }
+        },
+        {
+          "type": "file_url",
+          "file_url": "https://api.typeform.com/responses/files/9386c56f3ccc97eeef5e3aaa635ac2ba8881aa3b47d221863dc0dc316467fd14/test_lead_data.csv.csv",
+          "field": {
+            "id": "JAfy2LUm9bE5",
+            "type": "file_upload",
+            "ref": "73e92650-dd2e-4274-92bc-1056082b0a92"
+          }
+        }
+      ]
+    }
+  }
