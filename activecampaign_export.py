@@ -376,6 +376,28 @@ def get_agent_fields(agent_id, agent_dict, key=API_KEY):
     return agent_dict
 
 
+def get_agent_pipelines_deal_stages(agent_name):
+  # get all pipelines and deal stages for an agent
+  url = "https://peaksiderealty.api-us1.com/api/3/dealGroups?filters[title]=" + agent_name + "&orders[title]=ASC&orders[popular]=ASC"
+
+  headers = {
+      "Accept": "application/json",
+      "Api-Token": "40ddd4d7744346d5064b3dd77bef3bc0635ce1b64059b85cf34c74b5435ece2d851573a2"
+  }
+
+  response = requests.get(url, headers=headers)
+  return json.loads(response.text)
+
+
+
+
+def get_stage_id(target_stage, agent_pipelines):
+  # get id for a deal state
+  for stage_name in agent_pipelines['dealStages']:
+    if target_stage in stage_name['title'].lower():
+      return stage_name['id']
+
+
 #END TEMPLATE FOR UPLOAD
 
 # import requests
