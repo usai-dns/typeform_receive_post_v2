@@ -1,3 +1,4 @@
+
 from flask import Flask, request, render_template
 import json
 import pandas as pd
@@ -7,7 +8,7 @@ import intake_data as id
 import activecampaign_export as ace
 
 #this is how many of the contacts move into the 'active' lead list, the rest go to the 'pending' list
-UPDATE_CHUNK_SIZE = 5
+UPDATE_CHUNK_SIZE = 300
 
 '''
 next step is to get the dataframe into a format where we can create the upload json file
